@@ -1,0 +1,5 @@
+.vs/
+*.gen.cs
+*.user
+bin/
+obj/
