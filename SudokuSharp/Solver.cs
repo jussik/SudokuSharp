@@ -5,6 +5,7 @@ namespace SudokuSharp
 {
     internal static class Solver
     {
+        private const int MaxGuessLevels = 10;
         public enum Result
         {
             Success, Incomplete, Invalid, OutOfGuesses
@@ -27,7 +28,7 @@ namespace SudokuSharp
             + (minor % 3) * 9
             + (minor / 3);
 
-        public static Result Solve(Span<Cell> cells, int maxGuessLevels = 10, int guessLevel = 0)
+        public static Result Solve(Span<Cell> cells, int guessLevel = 0)
         {
             while (true)
             {
@@ -52,9 +53,9 @@ namespace SudokuSharp
                     || result == Result.Invalid)
                     return result;
                 if (!changed)
-                    return guessLevel > maxGuessLevels
+                    return guessLevel > MaxGuessLevels
                         ? Result.OutOfGuesses
-                        : Guess(cells, maxGuessLevels, guessLevel);
+                        : Guess(cells, guessLevel);
             }
         }
 
@@ -99,8 +100,9 @@ namespace SudokuSharp
             return result == Result.Success;
         }
 
-        private static Result Guess(Span<Cell> cells, int maxGuessLevels, int guessLevel)
+        private static Result Guess(Span<Cell> cells, int guessLevel)
         {
+            Span<Cell> newCells = stackalloc Cell[81];
             for (int poss = 2; poss < 10; poss++)
             {
                 // find cells with least possibles first
@@ -118,12 +120,11 @@ namespace SudokuSharp
                                 // check next LSB of possibles
                                 if ((p & 1) != 0)
                                 {
-                                    Span<Cell> newCells = stackalloc Cell[81];
                                     cells.CopyTo(newCells);
                                     // just make a guess from one of the remaining possible values
                                     newCells[c].Value = v;
                                     newCells[c].Possible = 1 << v;
-                                    if (Solve(newCells, maxGuessLevels, guessLevel + 1) == Result.Success)
+                                    if (Solve(newCells, guessLevel + 1) == Result.Success)
                                     {
                                         newCells.CopyTo(cells);
                                         return Result.Success;
