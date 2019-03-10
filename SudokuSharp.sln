@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SudokuSharp", "SudokuSharp\SudokuSharp.csproj", "{9CB317F1-5A81-443E-BF38-EC3166420DB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSharp.Tests", "..\SudokuSharp.Tests\SudokuSharp.Tests.csproj", "{9CC17276-BA6C-430D-880F-0334CE3ACBAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSharp.Tests", "SudokuSharp.Tests\SudokuSharp.Tests.csproj", "{9CC17276-BA6C-430D-880F-0334CE3ACBAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
