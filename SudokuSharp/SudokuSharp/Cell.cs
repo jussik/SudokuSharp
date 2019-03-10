@@ -40,14 +40,8 @@ namespace SudokuSharp
 
         public bool CheckPossible()
         {
-            int ones;
-            unchecked
-            {
-                // count ones (number of possibilities left)
-                int p = Possible - ((Possible >> 1) & 0x55555555);
-                p = (p & 0x33333333) + ((p >> 2) & 0x33333333);
-                ones = ((p + (p >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
-            }
+            // count ones (number of possibilities left)
+            int ones = Utils.CountOnes(Possible);
 
             if (ones != 1 || Value != Unknown)
                 return false;

@@ -8,49 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="LockedSolver.tt">
-      <LastGenOutput>LockedSolver.gen.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-    <None Update="HiddenSolver.tt">
-      <LastGenOutput>HiddenSolver.gen.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-    <None Update="Verifier.tt">
-      <LastGenOutput>Verifier.gen.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-    <None Update="SimpleSolver.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>SimpleSolver.gen.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="LockedSolver.gen.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LockedSolver.tt</DependentUpon>
-    </Compile>
-    <Compile Update="HiddenSolver.gen.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>HiddenSolver.tt</DependentUpon>
-    </Compile>
-    <Compile Update="SimpleSolver.gen.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SimpleSolver.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Verifier.gen.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Verifier.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 
 </Project>

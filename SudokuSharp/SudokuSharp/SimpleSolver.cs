@@ -1,30 +1,21 @@
-﻿<#@ template language="C#" #>
-<#@ output extension=".gen.cs" #>
-using System;
+﻿using System;
 
 namespace SudokuSharp
 {
-    public static class SimpleSolver
+    internal static class SimpleSolver
     {
-        public static bool Solve(Cell[] cells)
+        public static bool Solve(Span<Cell> cells, Solver.Indexer indexer)
         {
             bool changed = false;
             for (int major = 0; major < 9; major++)
             {
                 for (int minor = 0; minor < 8; minor++)
                 {
-					int i;
-					Cell ci;
-<#
-	string[] iterators = new[] { "Rows", "Cols", "BoxRows" };
-	foreach (string iterator in iterators) {
-#>
-					// <#= iterator #>
-                    i = Solver.<#= iterator #>Index(major, minor);
-                    ci = cells[i];
+                    int i = indexer(major, minor);
+                    Cell ci = cells[i];
                     for (int minorAdj = minor + 1; minorAdj < 9; minorAdj++)
                     {
-                        int j = Solver.<#= iterator #>Index(major, minorAdj);
+                        int j = indexer(major, minorAdj);
                         Cell cj = cells[j];
                         if (ci.Value != Cell.Unknown)
                         {
@@ -38,9 +29,6 @@ namespace SudokuSharp
                             changed |= cells[i].TryRemovePossible(cj.Value);
                         }
                     }
-<#
-	}
-#>
                 }
             }
             return changed;

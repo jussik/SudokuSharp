@@ -23,8 +23,8 @@ namespace SudokuSharp.Tests
 
             int tgtIndex = indexer(0, 8);
             Assert.That(cells[tgtIndex].Value, Is.EqualTo(Cell.Unknown));
-            SimpleSolver.Solve(cells);
-            SimpleSolver.Solve(cells);
+            SimpleSolver.Solve(cells, indexer);
+            SimpleSolver.Solve(cells, indexer);
             // final value should be 9
             Assert.That(cells[tgtIndex].Value, Is.EqualTo(8));
         }
@@ -38,8 +38,8 @@ namespace SudokuSharp.Tests
 
             int tgtIndex = indexer(0, 7);
             Assert.That(cells[tgtIndex].IsPossible(2), Is.True);
-            SimpleSolver.Solve(cells);
-            SimpleSolver.Solve(cells);
+            SimpleSolver.Solve(cells, indexer);
+            SimpleSolver.Solve(cells, indexer);
             // 8th element in same segment should not have 3 be possible
             Assert.That(cells[tgtIndex].IsPossible(2), Is.False);
         }

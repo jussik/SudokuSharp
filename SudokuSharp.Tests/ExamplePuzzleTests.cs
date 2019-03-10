@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Diagnostics;
+using NUnit.Framework;
 
 namespace SudokuSharp.Tests
 {
@@ -52,6 +54,12 @@ namespace SudokuSharp.Tests
         {
             Cell[] cells = Puzzle.ParsePuzzle(puzzle);
             Solver.Result res = Solver.Solve(cells);
+            //Stopwatch sw = Stopwatch.StartNew();
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    Solver.Solve(cells);
+            //}
+            //Console.WriteLine(sw.Elapsed);
             Assert.That(res, Is.EqualTo(Solver.Result.Success));
         }
     }
