@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("SudokuSharp.Tests")]
@@ -58,15 +60,43 @@ namespace SudokuSharp
             try { Console.SetWindowSize(Console.WindowWidth, Math.Min(Puzzles.Count * 15 + 5, Console.LargestWindowHeight)); }
             catch { /* can't resize window */ }
 
+            List<(string key, Cell[] cells)> puzzles = Puzzles
+                .Select(p => (key: p.Key, cells: Puzzle.ParsePuzzle(p.Value)))
+                .ToList();
+
+            Cell[] cellsToSolve = new Cell[81];
+            foreach ((string key, Cell[] start) in puzzles)
+            {
+                Array.Copy(start, cellsToSolve, 81);
+                Solver.Result result = Solver.Solve(cellsToSolve);
+                Console.WriteLine(Puzzle.FormatResults(key, result, start, cellsToSolve));
+            }
+
+            const int iterations = 1000;
+            Console.WriteLine($"Calculating durations (average of {iterations} iterations)...");
+            // run some iterations for jitting using easier puzzles
+            for (int i = 0; i < 500; i++)
+            {
+                Array.Copy(puzzles[2].cells, cellsToSolve, 81);
+                Solver.Solve(cellsToSolve);
+                Array.Copy(puzzles[1].cells, cellsToSolve, 81);
+                Solver.Solve(cellsToSolve);
+                Array.Copy(puzzles[0].cells, cellsToSolve, 81);
+                Solver.Solve(cellsToSolve);
+            }
+
+            // timed runs
             foreach ((string key, string value) in Puzzles)
             {
                 Cell[] start = Puzzle.ParsePuzzle(value);
-                Cell[] cells = new Cell[81];
-                Array.Copy(start, cells, 81);
-
-                Solver.Result result = Solver.Solve(cells);
-
-                Console.WriteLine(Puzzle.FormatResults(key, result, start, cells));
+                Stopwatch sw = Stopwatch.StartNew();
+                for (int i = 0; i < iterations; i++)
+                {
+                    Array.Copy(start, cellsToSolve, 81);
+                    Solver.Solve(cellsToSolve);
+                }
+                sw.Stop();
+                Console.WriteLine($"{key}: {((double)sw.ElapsedTicks / Stopwatch.Frequency) * 1000.0 / iterations} ms");
             }
         }
     }

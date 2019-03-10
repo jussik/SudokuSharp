@@ -4,7 +4,8 @@ namespace SudokuSharp
 {
     internal static class HiddenSolver
     {
-        public static bool Solve(Span<Cell> cells, Solver.Indexer indexer)
+        public static bool Solve<T>(Span<Cell> cells, ref T indexer)
+            where T : struct, IIndexer
         {
             Span<int> possRows = stackalloc int[9];
             bool changed = false;
@@ -14,7 +15,7 @@ namespace SudokuSharp
                 int ovr = 0; // bit is 1 once a second cell has it
                 for (int minor = 0; minor < 9; minor++)
                 {
-                    int i = indexer(major, minor);
+                    int i = indexer.Get(major, minor);
                     Cell cell = cells[i];
                     int pos = cell.Possible;
                     if (cell.Value != Cell.Unknown)
@@ -41,7 +42,7 @@ namespace SudokuSharp
                         if (p != 0)
                         {
                             // cell has unique possible
-                            int i = indexer(major, minor);
+                            int i = indexer.Get(major, minor);
                             cells[i].Possible = p;
                             changed |= cells[i].CheckPossible();
                         }

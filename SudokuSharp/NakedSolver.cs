@@ -20,7 +20,8 @@ namespace SudokuSharp
                 possible = Possible;
             }
         }
-        public static bool Solve(Span<Cell> cells, Solver.Indexer indexer)
+        public static bool Solve<T>(Span<Cell> cells, ref T indexer)
+            where T : struct, IIndexer
         {
             Span<PossPair> poss = stackalloc PossPair[9];
             bool changed = false;
@@ -29,7 +30,7 @@ namespace SudokuSharp
                 int count = 0;
                 for (int minor = 0; minor < 9; minor++)
                 {
-                    int i = indexer(major, minor);
+                    int i = indexer.Get(major, minor);
                     Cell cell = cells[i];
                     if (cell.Value == Cell.Unknown) {
                         poss[count] = new PossPair(i, cell.Possible);

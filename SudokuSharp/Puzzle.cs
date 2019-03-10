@@ -35,7 +35,7 @@ namespace SudokuSharp
                     {
                         if (minor % 3 == 0)
                             sb.Append("|");
-                        int value = cells[Solver.RowsIndex(major, minor)].Value;
+                        int value = cells[Solver.RowsIndex.Get(major, minor)].Value;
                         sb.Append(value == Cell.Unknown ? " " : (value + 1).ToString());
                     }
                 }
@@ -68,7 +68,7 @@ namespace SudokuSharp
                     {
                         if (minor % 3 == 0)
                             sb.Append("|");
-                        int value = cells[Solver.RowsIndex(major, minor)].Value;
+                        int value = cells[Solver.RowsIndex.Get(major, minor)].Value;
                         sb.Append(value == Cell.Unknown ? " " : (value + 1).ToString());
                     }
                 }

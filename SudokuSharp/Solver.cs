@@ -1,8 +1,34 @@
 using System;
-using System.Runtime.CompilerServices;
 
 namespace SudokuSharp
 {
+    internal interface IIndexer
+    {
+        int Get(int major, int minor);
+    }
+    internal struct RowsIndexer : IIndexer
+    {
+        public int Get(int major, int minor) => major * 9 + minor;
+    }
+    internal struct ColsIndexer : IIndexer
+    {
+        public int Get(int major, int minor) => minor * 9 + major;
+    }
+    internal struct BoxRowsIndexer : IIndexer
+    {
+        public int Get(int major, int minor) => (major % 3) * 3
+            + (major / 3) * 27
+            + (minor % 3)
+            + (minor / 3) * 9;
+    }
+    internal struct BoxColsIndexer : IIndexer
+    {
+        public int Get(int major, int minor) => (major % 3) * 27
+            + (major / 3) * 3
+            + (minor % 3) * 9
+            + (minor / 3);
+    }
+
     internal static class Solver
     {
         private const int MaxGuessLevels = 10;
@@ -11,45 +37,33 @@ namespace SudokuSharp
             Success, Incomplete, Invalid, OutOfGuesses
         }
 
-        public delegate int Indexer(int major, int minor);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int RowsIndex(int major, int minor) => major * 9 + minor;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ColsIndex(int major, int minor) => minor * 9 + major;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BoxRowsIndex(int major, int minor) => (major % 3) * 3
-            + (major / 3) * 27
-            + (minor % 3)
-            + (minor / 3) * 9;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BoxColsIndex(int major, int minor) => (major % 3) * 27
-            + (major / 3) * 3
-            + (minor % 3) * 9
-            + (minor / 3);
+        public static RowsIndexer RowsIndex;
+        public static ColsIndexer ColsIndex;
+        public static BoxRowsIndexer BoxRowsIndex;
+        public static BoxColsIndexer BoxColsIndex;
 
         public static Result Solve(Span<Cell> cells, int guessLevel = 0)
         {
             while (true)
             {
                 bool changed = false;
-                changed |= SimpleSolver.Solve(cells, RowsIndex);
-                changed |= SimpleSolver.Solve(cells, ColsIndex);
-                changed |= SimpleSolver.Solve(cells, BoxRowsIndex);
-                changed |= HiddenSolver.Solve(cells, RowsIndex);
-                changed |= HiddenSolver.Solve(cells, ColsIndex);
-                changed |= HiddenSolver.Solve(cells, BoxRowsIndex);
-                changed |= LockedSolver.Solve(cells, BoxRowsIndex, RowsIndex);
-                changed |= LockedSolver.Solve(cells, BoxColsIndex, ColsIndex);
-                changed |= LockedSolver.Solve(cells, RowsIndex, BoxRowsIndex);
-                changed |= LockedSolver.Solve(cells, ColsIndex, BoxColsIndex);
-                changed |= NakedSolver.Solve(cells, RowsIndex);
-                changed |= NakedSolver.Solve(cells, ColsIndex);
-                changed |= NakedSolver.Solve(cells, BoxRowsIndex);
+                changed |= SimpleSolver.Solve(cells, ref RowsIndex);
+                changed |= SimpleSolver.Solve(cells, ref ColsIndex);
+                changed |= SimpleSolver.Solve(cells, ref BoxRowsIndex);
+                changed |= HiddenSolver.Solve(cells, ref RowsIndex);
+                changed |= HiddenSolver.Solve(cells, ref ColsIndex);
+                changed |= HiddenSolver.Solve(cells, ref BoxRowsIndex);
+                changed |= LockedSolver.Solve(cells, ref BoxRowsIndex, ref RowsIndex);
+                changed |= LockedSolver.Solve(cells, ref BoxColsIndex, ref ColsIndex);
+                changed |= LockedSolver.Solve(cells, ref RowsIndex, ref BoxRowsIndex);
+                changed |= LockedSolver.Solve(cells, ref ColsIndex, ref BoxColsIndex);
+                changed |= NakedSolver.Solve(cells, ref RowsIndex);
+                changed |= NakedSolver.Solve(cells, ref ColsIndex);
+                changed |= NakedSolver.Solve(cells, ref BoxRowsIndex);
 
-                if (Verify(cells, RowsIndex, out Result result)
-                    && Verify(cells, ColsIndex, out result)
-                    && Verify(cells, BoxRowsIndex, out result)
+                if (Verify(cells, ref RowsIndex, out Result result)
+                    && Verify(cells, ref ColsIndex, out result)
+                    && Verify(cells, ref BoxRowsIndex, out result)
                     || result == Result.Invalid)
                     return result;
                 if (!changed)
@@ -63,7 +77,8 @@ namespace SudokuSharp
         /// Verify a single axis in the puzzle.
         /// True means continue verification, false means further verification not required.
         /// </summary>
-        private static bool Verify(Span<Cell> cells, Indexer indexer, out Result result)
+        private static bool Verify<T>(Span<Cell> cells, ref T indexer, out Result result)
+            where T : struct, IIndexer
         {
             result = Result.Success;
             for (int major = 0; major < 9; major++)
@@ -71,7 +86,7 @@ namespace SudokuSharp
                 int valMask = 0;
                 for (int minor = 0; minor < 9; minor++)
                 {
-                    Cell cell = cells[indexer(major, minor)];
+                    Cell cell = cells[indexer.Get(major, minor)];
                     if (cell.Value == Cell.Unknown)
                     {
                         if (cell.Possible == 0)
