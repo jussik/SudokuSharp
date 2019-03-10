@@ -1,9 +1,11 @@
-﻿using System.Runtime.Intrinsics.X86;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.X86;
 
 namespace SudokuSharp
 {
     public static class Utils
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CountOnes(int value)
         {
             unchecked
